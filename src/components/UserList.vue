@@ -19,19 +19,21 @@
       return {
         users: [],
         errors: [],
-        columns: ['_id','firstname', 'lastname'],
+        columns: ['_id','firstname', 'lastname','score'],
         options: {
           filterable: ['firstname', 'lastname'],
           headings: {
             _id: 'ID',
             firstname: 'Code',
-            lastname: 'Letter'
+            lastname: 'Letter',
+            score:'Score'
           }
         }
       }
     },
     created () {
       this.loadUsers()
+
     },
     methods: {
       loadUsers: function () {
@@ -40,11 +42,29 @@
             // JSON responses are automatically parsed.
             this.users = response.data
             console.log(this.users)
+            this.getScoreforUsers()
           })
           .catch(error => {
             this.errors.push(error)
             console.log(error)
           })
+      },getScoreforUsers: function () {
+        try{this.users.forEach(function(user){
+          console.log(user._id)
+          MorseService.fetchScore(user._id)
+            .then(response => {
+              // JSON responses are automatically parsed.
+              this.user.score = response.data.fullscore
+              console.log(response.data)
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        })}
+        catch(error){
+          this.errors.push(error)
+          console.log(error)
+        }
       }
     }
   }

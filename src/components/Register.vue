@@ -2,7 +2,7 @@
   <div class="hero">
     <h1 class="vue-title">Morse Trainer</h1>
 
-    <form @submit.prevent="submit" v-show="!usersignedin.status">
+    <form @submit.prevent="submit">
       <div class="form-group" :class="{ 'form-group--error': $v.useremail.$error }">
         <label class="form__label">Email</label>
         <input class="form__input" placeholder="enter Email here" v-model.trim="$v.useremail.$model"/>
@@ -16,17 +16,13 @@
       <div class="error" v-if="!$v.userpassword.required">Password is Required</div>
       <div class="error" v-if="!$v.userpassword.minLength">Password must be at least {{$v.userpassword.$params.minLength.min}} long.</div>
       <p>
-        <button class="btn btn-primary btn1" type="submit" :disabled="submitStatus === 'PENDING'">Sign in </button>
+        <button class="btn btn-primary btn1" type="submit" :disabled="submitStatus === 'PENDING'">Register</button>
       </p>
-      <p class="typo__p" v-if="submitStatus === 'OK'">Logged in</p>
+      <p class="typo__p" v-if="submitStatus === 'OK'">Thanks for your Donation!</p>
       <p class="typo__p" v-if="submitStatus === 'ERROR'">Please Fill in the Form Correctly.</p>
-      <p class="typo__p" v-if="submitStatus === 'PENDING'">Loggin in...</p>
+      <p class="typo__p" v-if="submitStatus === 'PENDING'">Donating...</p>
     </form>
-    <p v-show="usersignedin.status" class="lead">
-      Welcome {{vueuser.email}}
-    </p>
-    <p v-show="!usersignedin.status">
-      <router-link to="/register" tag="button">Register</router-link></p>
+
   </div>
 </template>
 <script>
@@ -52,13 +48,7 @@
         messagetitle: ' MorseTrainer ',
         useremail: "",
         userpassword: "",
-        submitStatus: null,
-        vueuser:{
-          firstname:"",
-          lastname:"",
-          email:""
-        },
-        usersignedin:{status:false}
+        submitStatus: null
       }
     },
     validations: {
@@ -70,9 +60,6 @@
         required,
         minLength: minLength(6)
       }
-    },created () {
-      this.checkUser(this.vueuser,this.usersignedin)
-
     },
     methods: {
       submit () {
@@ -85,7 +72,7 @@
           this.submitStatus = 'PENDING'
           setTimeout(() => {
             this.submitStatus = 'OK'
-            firebase.auth().signInWithEmailAndPassword(this.useremail, this.userpassword).catch(function(error) {
+            firebase.auth().createUserWithEmailAndPassword(this.useremail, this.userpassword).catch(function(error) {
               // Handle Errors here.
               var errorCode = error.code;
               var errorMessage = error.message;
@@ -93,22 +80,6 @@
               // ...
             });
           }, 500)
-        }
-      },checkUser: function (vueuser,usersignedin) {
-        firebase.auth().onAuthStateChanged(function(user) {
-          if (user) {
-            // User is signed in.
-            console.log(user.email)
-            vueuser.email=user.email
-            usersignedin.status=true
-          } else {
-            // No user is signed in.
-            usersignedin.status=false
-            console.log("no User Logged in")
-          }
-        });
-        if(vueuser.email!=""){
-          usersignedin.status=true
         }
       }
     }

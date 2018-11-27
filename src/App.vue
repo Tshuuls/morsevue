@@ -7,10 +7,10 @@
         <b-navbar-nav>
           <b-nav-item to="/#"><i class="fa fa-home" style="padding: 5px"> Home</i></b-nav-item>
           <b-nav-item to="/morsetable"><i class="fa fa-list" style="padding: 5px"> Morse Table</i></b-nav-item>
-          <b-nav-item to="/userlist"><i class="fa fa-list" style="padding: 5px"> List Users</i></b-nav-item>
+          <b-nav-item to="/userlist"><i class="fa fa-list" style="padding: 5px"> ScoreBoard</i></b-nav-item>
         </b-navbar-nav>
         <b-navbar-nav class="ml-auto">
-          <b-nav-item to="/login"><i class="fa fa-sign-in" style="padding: 5px"> Login </i></b-nav-item>
+          <b-nav-item to="/myaccount"><i class="fa fa-sign-in" style="padding: 5px"> My Account </i></b-nav-item>
           <b-nav-item to="/logout"><i class="fa fa-sign-out" style="padding: 5px"> Logout </i></b-nav-item>
           <i class="fa fa-pied-piper-alt fa-1x" style="padding: 5px; color: white;"></i>
         </b-navbar-nav>

@@ -1,4 +1,4 @@
-describe('Home page', () => {
+describe('Scoreboard', () => {
   beforeEach(() => {
     cy.visit('#/userlist')
   })

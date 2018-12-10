@@ -8,3 +8,8 @@ notifications:
     - julia.z@chello.at      # change to your own address
     on_success: never        # default: change
     on_failure: always       # default: always
+deploy:
+  provider: heroku
+  api_key:
+    secure: "2e32271d-bc23-4adf-9472-d0585a86aeae"
+  app: morsevue

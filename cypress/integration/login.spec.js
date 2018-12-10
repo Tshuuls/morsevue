@@ -1,4 +1,4 @@
-describe('Home page', () => {
+describe('Login Form', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.get('.navbar').contains('Logout').click()

@@ -1,4 +1,4 @@
-describe('Home page', () => {
+describe('MorseTable', () => {
   beforeEach(() => {
     cy.visit('#/morsetable')
   })

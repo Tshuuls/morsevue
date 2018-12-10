@@ -5,13 +5,13 @@
     <form @submit.prevent="submit" v-show="!usersignedin.status">
       <div class="form-group" :class="{ 'form-group--error': $v.useremail.$error }">
         <label class="form__label">Email</label>
-        <input class="form__input" placeholder="enter Email here" v-model.trim="$v.useremail.$model"/>
+        <input class="form__input" id="inputemail" placeholder="enter Email here" v-model.trim="$v.useremail.$model"/>
       </div>
       <div class="error" v-if="!$v.useremail.required">Email is Required</div>
       <div class="error" v-if="!$v.useremail.email">Must be an Email-address.</div>
       <div class="form-group" :class="{ 'form-group--error': $v.userpassword.$error }">
         <label class="form__label">Password</label>
-        <input type="password" class="form__input" placeholder="enter Password here" v-model.trim="$v.userpassword.$model"/>
+        <input type="password" id="inputpassword" class="form__input" placeholder="enter Password here" v-model.trim="$v.userpassword.$model"/>
       </div>
       <div class="error" v-if="!$v.userpassword.required">Password is Required</div>
       <div class="error" v-if="!$v.userpassword.minLength">Password must be at least {{$v.userpassword.$params.minLength.min}} long.</div>

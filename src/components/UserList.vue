@@ -24,8 +24,8 @@
           filterable: ['firstname', 'lastname'],
           headings: {
             _id: 'ID',
-            firstname: 'Code',
-            lastname: 'Letter',
+            firstname: 'Firstname',
+            lastname: 'Lastname',
             score:'Score'
           }
         }

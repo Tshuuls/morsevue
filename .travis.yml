@@ -2,3 +2,9 @@ dist: trusty
 language: node_js
 node_js:
 - stable
+notifications:
+  email:
+    recipients:
+    - julia.z@chello.at      # change to your own address
+    on_success: never        # default: change
+    on_failure: always       # default: always

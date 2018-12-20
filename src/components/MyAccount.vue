@@ -18,8 +18,7 @@
     data () {
       return {
         vueuser:{
-          firstname:"",
-          lastname:"",
+          id:"",
           email:""
         },
         usersignedin:{status:false}
@@ -36,6 +35,7 @@
             // User is signed in.
             console.log(user.email)
             vueuser.email=user.email
+            vueuser.id=user.uid
             usersignedin.status=true
           } else {
             // No user is signed in.

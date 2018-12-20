@@ -1,6 +1,6 @@
 <template>
   <div id="app1">
-    <v-client-table :columns="columns" :data="users" :options="options">
+    <v-client-table ref="table" :columns="columns" :data="users" :options="options">
     </v-client-table>
   </div>
 </template>
@@ -19,13 +19,11 @@
       return {
         users: [],
         errors: [],
-        columns: ['_id','firstname', 'lastname','score'],
+        columns: ['email','score'],
         options: {
-          filterable: ['firstname', 'lastname'],
+          filterable: ['email','score'],
           headings: {
-            _id: 'ID',
-            firstname: 'Firstname',
-            lastname: 'Lastname',
+            email: 'Email',
             score:'Score'
           }
         }
@@ -40,31 +38,47 @@
         MorseService.fetchUsers()
           .then(response => {
             // JSON responses are automatically parsed.
-            this.users = response.data
-            console.log(this.users)
-            this.getScoreforUsers()
+            //this.users =
+            //console.log(this.users)
+            this.getScoreforUsers(response.data)
           })
           .catch(error => {
             this.errors.push(error)
             console.log(error)
           })
-      },getScoreforUsers: function () {
-        try{this.users.forEach(function(user){
-          console.log(user._id)
+      },getScoreforUsers: function (scoreusers) {
+        try{scoreusers.forEach(function(user){
+          //console.log("getScoreforUsers userID: "+user._id)
           MorseService.fetchScore(user._id)
             .then(response => {
               // JSON responses are automatically parsed.
-              this.user.score = response.data.fullscore
-              console.log(response.data)
+
+              if (response.data.fullscore===undefined){
+                user.score="0";
+              } else{
+                user.score = response.data.fullscore.toString();
+              }
+
+              //console.log(user)
+
             })
             .catch(error => {
               console.log(error)
             })
-        })}
+        }
+        );
+        //console.log(scoreusers)
+          this.users=scoreusers
+          this.onUpdate();
+          //console.log(this.users)
+        }
         catch(error){
           this.errors.push(error)
           console.log(error)
         }
+      },
+      onUpdate: function() {
+        this.$refs.table.refresh();
       }
     }
   }

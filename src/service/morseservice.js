@@ -30,5 +30,8 @@ export default {
   },
   DeleteUser(userID) {
     return Api().delete('/users/'+userID)
+  },
+  DeleteCourse(courseID) {
+    return Api().delete('/courses/'+courseID)
   }
 }

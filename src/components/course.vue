@@ -25,6 +25,8 @@
         <p class="typo__p" v-if="submitStatus === 'PENDING'">Course is generating.</p>
     </form>
     <v-client-table v-show="overviewacitve" ref="table" :columns="columns" :data="courses" :options="options">
+      <a slot="redo" slot-scope="prop" class="fa fa-repeat fa-2x" @click="redo(prop.row._id)"></a>
+      <a slot="delete" slot-scope="prop" class="fa fa-times fa-2x" @click="deletecourse(prop.row._id)"></a>
     </v-client-table>
 
     <div v-show="courseactive">
@@ -95,10 +97,12 @@
         },SigninStatus: {
           type: Object,
           required: true
-        }
+        },
+
       },
     data () {
       return {
+        prop:['_id'],
         vueuser:{
           id:this.UserID,
           email:this.UserEmail
@@ -115,13 +119,15 @@
         courseactive:false,
         overviewacitve:true,
         courselength:0,
-        columns: ['score','coursetype','count'],
+        columns: ['score','coursetype','count','redo','delete'],
         options: {
           filterable: ['score','coursetype','count'],
           headings: {
             coursetype: 'Coursetype',
             score:'Score',
-            count:'Count'
+            count:'Count',
+            redo:'Redo',
+            delete:"Delete"
           }
         }
       }
@@ -142,7 +148,56 @@
 
     },
     methods: {
+      deletecourse: function (id) {
+        MorseService.DeleteCourse(id)
+          .then(response => {
+            console.log(response.data)
+            this.getCourses(this.vueuser)
+          })
+          .catch(error => {
+            this.errors.push(error)
+            console.log(error)
+          })
+      },
+      redo: function (id) {
+        console.log(id)
+        var templist=[];
+        var course={}
+        this.courses.forEach(function(item){
+          if(item._id==id){
+            course=item
+          }
+        })
+        this.newcourse={}
+        this.newcourse=course
+        if (this.newcourse.coursetype=="morse"){
+
+          this.newcourse.coursecontent.forEach(function(item){
+            var tempitem={};
+            tempitem.given=item.morse;
+            tempitem.answer="";
+            templist.push(tempitem);
+          })
+        } else{
+          this.newcourse.coursecontent.forEach(function(item){
+            var tempitem={};
+            tempitem.given=item.letter;
+            tempitem.answer="";
+            templist.push(tempitem);
+          })
+        }
+        this.courselist={}
+        this.courselist=templist;
+
+
+        this.showresults=false;
+        this.courseactive=true;
+        this.overviewacitve=false;
+      },
       finishCourse(){
+        this.newcourse={};
+        this.courselist=[];
+        this.results=[];
         this.showresults=false;
         this.courseactive=false;
         this.overviewacitve=true;

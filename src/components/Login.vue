@@ -20,6 +20,7 @@
       </p>
       <p class="typo__p" v-if="submitStatus === 'OK'">Logged in</p>
       <p class="typo__p" v-if="submitStatus === 'ERROR'">Please Fill in the Form Correctly.</p>
+      <p class="typo__p" v-if="submitStatus === 'LOGINERROR'">Login Error.</p>
       <p class="typo__p" v-if="submitStatus === 'PENDING'">Loggin in...</p>
     </form>
     <p v-show="usersignedin.status" class="lead">
@@ -85,14 +86,20 @@
           this.submitStatus = 'PENDING'
           setTimeout(() => {
             this.submitStatus = 'OK'
-            firebase.auth().signInWithEmailAndPassword(this.useremail, this.userpassword).catch(function(error) {
+            firebase.auth().signInWithEmailAndPassword(this.useremail, this.userpassword)
+              .then(function(){
+
+              })
+              .catch(function(error) {
               // Handle Errors here.
               var errorCode = error.code;
               var errorMessage = error.message;
               console.log(errorCode,errorMessage)
               // ...
             });
+            this.submitStatus = 'LOGINERROR'
           }, 500)
+
         }
       },checkUser: function (vueuser,usersignedin) {
         firebase.auth().onAuthStateChanged(function(user) {

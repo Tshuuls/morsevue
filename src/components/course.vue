@@ -1,7 +1,7 @@
 <template>
   <div id="app1">
 
-      <form @submit.prevent="submit" v-show="!courseactive">
+      <form @submit.prevent="submit" v-show="overviewacitve">
         <input type="radio" id="morse" value="morse" v-model="picked">
         <label for="morse">Morse</label>
         <br>
@@ -24,7 +24,7 @@
     <p class="typo__p" v-if="submitStatus === 'ERROR'">Please Fill in the Form Correctly.</p>
         <p class="typo__p" v-if="submitStatus === 'PENDING'">Course is generating.</p>
     </form>
-    <v-client-table v-show="!courseactive" ref="table" :columns="columns" :data="courses" :options="options">
+    <v-client-table v-show="overviewacitve" ref="table" :columns="columns" :data="courses" :options="options">
     </v-client-table>
 
     <div v-show="courseactive">
@@ -42,6 +42,23 @@
         </p>
       </form>
     </div>
+    <div v-show="showresults">
+      <h3>Score: {{coursescore}}</h3>
+      <table class="table">
+        <tr>
+          <th>Morse</th>
+          <th>Letter</th>
+          <th>Answer</th>
+        </tr>
+        <tr v-for="(item) in results" style="font-weight: bold">
+          <td>{{item.morse}}</td>
+          <td>{{item.letter}}</td>
+          <td v-if="item.answer ===item.letter ||item.answer ===item.morse" style=" color:green">{{item.answer}}</td>
+          <td v-else style="color:red">{{item.answer}}</td>
+        </tr>
+      </table>
+      <button class="btn btn-primary btn1" type="finishCourse" v-on:click="finishCourse"> Finish course</button>
+    </div >
   </div>
 </template>
 
@@ -92,7 +109,11 @@
         submitStatus:"",
         newcourse:{},
         courselist:[],
+        results:[],
+        coursescore:0,
+        showresults:false,
         courseactive:false,
+        overviewacitve:true,
         courselength:0,
         columns: ['score','coursetype','count'],
         options: {
@@ -121,12 +142,19 @@
 
     },
     methods: {
-       evaluate(){
+      finishCourse(){
+        this.showresults=false;
+        this.courseactive=false;
+        this.overviewacitve=true;
+      }
+       ,evaluate(){
         var tempindex=0;
         var score=0;
          var coursecontent=this.newcourse.coursecontent
          var templist=[];
          var tempcourselist=this.courselist;
+         var tempresults=this.results;
+         var tempobject={};
          console.log(coursecontent)
          if (this.newcourse.coursetype=="morse"){
 
@@ -135,6 +163,11 @@
              {
                score++;
              }
+             tempobject={};
+             tempobject.letter=item.letter;
+             tempobject.morse=item.morse;
+             tempobject.answer=tempcourselist[tempindex].answer.toUpperCase()
+             tempresults.push(tempobject);
              tempindex++;
            })
          } else{
@@ -143,10 +176,16 @@
              {
                score++;
              }
+             tempobject={};
+             tempobject.letter=item.letter;
+             tempobject.morse=item.morse;
+             tempobject.answer=tempcourselist[tempindex].answer.toUpperCase()
+             tempresults.push(tempobject);
              tempindex++;
            })
          }
          console.log(score);
+         this.coursescore=score;
          MorseService.UpdateScore(this.newcourse._id,score).then(response => {
            console.log(response.data)
            this.getCourses(this.vueuser)
@@ -155,7 +194,9 @@
              //this.errors.push(error)
              console.log(error)
            })
+         this.results= tempresults;
          this.courseactive=false;
+         this.showresults=true
        }
       ,submit () {
         console.log('submit!')
@@ -171,6 +212,7 @@
 
               this.newcourse=response.data.course;
               this.courseactive=true;
+              this.overviewacitve=false;
 
               var coursecontent=this.newcourse.coursecontent
               var templist=[];

@@ -27,5 +27,8 @@ export default {
     return Api().put('/courses/'+userID,{
       score:score
     })
+  },
+  DeleteUser(userID) {
+    return Api().delete('/users/'+userID)
   }
 }

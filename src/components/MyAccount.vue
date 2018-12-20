@@ -3,12 +3,13 @@
     <p>My account</p>
     <p v-show="usersignedin.status">hello {{vueuser.email}}</p>
     <p v-show="!usersignedin.status">Please log in {{vueuser.email}} {{usersignedin.status}}<router-link to="/#" tag="button">Login</router-link></p>
+    <button class="btn btn-primary btn1" type="deleteUser" v-on:click="deleteUser"> Delete my User</button>
   </div>
 </template>
 
 <script>
  // import Vue from 'vue'
- // import MorseService from '@/service/morseservice'
+  import MorseService from '@/service/morseservice'
 
  import firebase from "firebase"
 
@@ -29,7 +30,25 @@
 
     },
     methods: {
-      checkUser: function (vueuser,usersignedin) {
+      deleteUser (){
+        var user = firebase.auth().currentUser;
+
+        user.delete().then(function() {
+          MorseService.DeleteUser(user.uid)
+            .then(response => {
+              console.log(response.data)
+
+          })
+            .catch(error => {
+              //this.errors.push(error)
+              console.log(error)
+            })
+        }).catch(function(error) {
+          console.log(error)
+        });
+        this.$router.push('/')
+      }
+      ,checkUser: function (vueuser,usersignedin) {
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
             // User is signed in.

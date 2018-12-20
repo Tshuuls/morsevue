@@ -18,9 +18,9 @@
       <p>
         <button class="btn btn-primary btn1" type="submit" :disabled="submitStatus === 'PENDING'">Register</button>
       </p>
-      <p class="typo__p" v-if="submitStatus === 'OK'">Thanks for your Donation!</p>
+      <p class="typo__p" v-if="submitStatus === 'OK'">Registration Succsessful</p>
       <p class="typo__p" v-if="submitStatus === 'ERROR'">Please Fill in the Form Correctly.</p>
-      <p class="typo__p" v-if="submitStatus === 'PENDING'">Donating...</p>
+      <p class="typo__p" v-if="submitStatus === 'PENDING'">Registering...</p>
     </form>
 
   </div>

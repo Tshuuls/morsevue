@@ -163,9 +163,11 @@
         console.log(id)
         var templist=[];
         var course={}
+        console.log(this.courses)
         this.courses.forEach(function(item){
           if(item._id==id){
             course=item
+            console.log(item)
           }
         })
         this.newcourse={}
@@ -304,10 +306,8 @@
           .then(response => {
             console.log(response.data)
             this.courses=response.data
-            var tempcount=0;
             response.data.forEach(function (item) {
-              item.count=item.coursecontent.length-tempcount;
-              tempcount=item.coursecontent.length
+              item.count=item.coursecontent.length;
             })
           })
           .catch(error => {

@@ -2,8 +2,8 @@
   <div id="app1">
     <p>My account</p>
     <p v-show="usersignedin.status">hello {{vueuser.email}}</p>
-    <p v-show="!usersignedin.status">Please log in {{vueuser.email}} {{usersignedin.status}}<router-link to="/#" tag="button">Login</router-link></p>
-    <button class="btn btn-primary btn1" type="deleteUser" v-on:click="deleteUser"> Delete my User</button>
+    <p v-show="!usersignedin.status">Please <router-link to="/#" tag="button">Login</router-link></p>
+    <button v-show="usersignedin.status" class="btn btn-primary btn1" type="deleteUser" v-on:click="deleteUser"> Delete my User</button>
   </div>
 </template>
 

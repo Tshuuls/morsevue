@@ -2,7 +2,10 @@
   <div class="hero">
     <h1 class="vue-title">Morse Trainer</h1>
 
-
+    <p v-show="!usersignedin.status">
+      <router-link to="/Login" tag="button">Login</router-link></p>
+    <p v-show="!usersignedin.status">
+      <router-link to="/register" tag="button">Register</router-link></p>
     <p v-show="usersignedin.status" class="lead">
       Welcome {{vueuser.email}}
     </p>

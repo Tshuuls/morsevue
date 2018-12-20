@@ -6,6 +6,8 @@ import UserList from '@/components/UserList'
 import Register from '@/components/Register'
 import MyAccount from '@/components/MyAccount'
 import Logout from '@/components/Logout'
+import Login from '@/components/Login'
+import Course from '@/components/Course'
 
 Vue.use(Router)
 
@@ -40,6 +42,16 @@ export default new Router({
       path: '/logout',
       name: 'Logout',
       component: Logout
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/course',
+      name: 'Course',
+      component: Course
     }
   ]
 })

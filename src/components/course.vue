@@ -1,0 +1,243 @@
+<template>
+  <div id="app1">
+
+      <form @submit.prevent="submit" v-show="!courseactive">
+        <input type="radio" id="morse" value="morse" v-model="picked">
+        <label for="morse">Morse</label>
+        <br>
+        <input type="radio" id="letter" value="letter" v-model="picked">
+        <label for="letter">Letter</label>
+        <br>
+        <span>Picked: {{ picked }}</span>
+        <br />
+        <div class="error" v-if="!$v.picked.required">CourseType is Required</div>
+
+        <div class="form-group" :class="{ 'form-group--error': $v.courselength.$error }">
+          <label class="form__label">enter Courselength here</label>
+          <input class="form__input" id="courselength" placeholder="0" v-model.trim="$v.courselength.$model"/>
+        </div>
+        <div class="error" v-if="!$v.courselength.required">Courselength is Required</div>
+
+    <p>
+      <button class="btn btn-primary btn1" type="submit" :disabled="submitStatus === 'PENDING'">Start new course </button>
+    </p>
+    <p class="typo__p" v-if="submitStatus === 'ERROR'">Please Fill in the Form Correctly.</p>
+        <p class="typo__p" v-if="submitStatus === 'PENDING'">Course is generating.</p>
+    </form>
+    <v-client-table v-show="!courseactive" ref="table" :columns="columns" :data="courses" :options="options">
+    </v-client-table>
+
+    <div v-show="courseactive">
+      <form @submit.prevent="evaluate">
+
+        <div class="form-group" v-for="(item,index) in courselist">
+          <label class="form__label">{{item.given}}</label>
+          <input class="form__input"  :id="index" placeholder="" v-model="item.answer"/>
+          <div class="error" v-if="!$v.courselength.required">Field is Required</div>
+        </div>
+
+
+        <p>
+          <button class="btn btn-primary btn1" type="evaluate" :disabled="submitStatus === 'PENDING'">Submit</button>
+        </p>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+  import Vue from 'vue'
+  import firebase from "firebase"
+  import MorseService from '@/service/morseservice'
+  import VueTables from 'vue-tables-2'
+  import VueForm from 'vueform'
+  import Vuelidate from 'vuelidate'
+  import { required } from 'vuelidate/lib/validators'
+
+
+  Vue.use(VueTables.ClientTable, {compileTemplates: true, filterByColumn: true})
+  Vue.use(VueForm, {
+    inputClasses: {
+      valid: 'form-control-success',
+      invalid: 'form-control-danger'
+    }
+  })
+
+  Vue.use(Vuelidate)
+
+
+    export default {
+        name: "course",
+      props: {
+        UserEmail: {
+          type: String,
+          required: false
+        },UserID: {
+          type: String,
+          required: false
+        },SigninStatus: {
+          type: Object,
+          required: true
+        }
+      },
+    data () {
+      return {
+        vueuser:{
+          id:this.UserID,
+          email:this.UserEmail
+        },
+        usersignedin:this.SigninStatus,
+        courses:[],
+        picked:"",
+        submitStatus:"",
+        newcourse:{},
+        courselist:[],
+        courseactive:false,
+        courselength:0,
+        columns: ['score','coursetype','count'],
+        options: {
+          filterable: ['score','coursetype','count'],
+          headings: {
+            coursetype: 'Coursetype',
+            score:'Score',
+            count:'Count'
+          }
+        }
+      }
+    },
+      validations: {
+        courselength: {
+          required,
+          number:true
+        },
+        picked:{
+          required
+        }
+      },created () {
+      //this.checkUser(this.vueuser,this.usersignedin)
+      this.getCourses(this.vueuser)
+
+
+
+    },
+    methods: {
+       evaluate(){
+        var tempindex=0;
+        var score=0;
+         var coursecontent=this.newcourse.coursecontent
+         var templist=[];
+         var tempcourselist=this.courselist;
+         console.log(coursecontent)
+         if (this.newcourse.coursetype=="morse"){
+
+           coursecontent.forEach(function(item){
+             if(item.letter==tempcourselist[tempindex].answer.toUpperCase())
+             {
+               score++;
+             }
+             tempindex++;
+           })
+         } else{
+           coursecontent.forEach(function(item){
+             if(item.morse==tempcourselist[tempindex].answer)
+             {
+               score++;
+             }
+             tempindex++;
+           })
+         }
+         console.log(score);
+         MorseService.UpdateScore(this.newcourse._id,score).then(response => {
+           console.log(response.data)
+           this.getCourses(this.vueuser)
+         })
+           .catch(error => {
+             //this.errors.push(error)
+             console.log(error)
+           })
+         this.courseactive=false;
+       }
+      ,submit () {
+        console.log('submit!')
+        this.$v.$touch()
+        if (this.$v.$invalid) {
+          this.submitStatus = 'ERROR'
+        } else {
+          // do your submit logic here
+          this.submitStatus = 'PENDING'
+          setTimeout(() => {
+            this.submitStatus = 'OK'
+            MorseService.newCourse(this.vueuser.id,this.courselength,this.picked).then(response=>{
+
+              this.newcourse=response.data.course;
+              this.courseactive=true;
+
+              var coursecontent=this.newcourse.coursecontent
+              var templist=[];
+              console.log(coursecontent)
+              if (this.newcourse.coursetype=="morse"){
+
+                coursecontent.forEach(function(item){
+                  var tempitem={};
+                  tempitem.given=item.morse;
+                  tempitem.answer="";
+                  templist.push(tempitem);
+                })
+              } else{
+                coursecontent.forEach(function(item){
+                  var tempitem={};
+                  tempitem.given=item.letter;
+                  tempitem.answer="";
+                  templist.push(tempitem);
+                })
+              }
+              this.courselist=templist;
+
+            }).catch(error => {
+              this.errors.push(error)
+              console.log(error)
+            })
+
+          }, 500)
+        }
+      }
+      ,getCourses: function(vueuser){
+        console.log("userID:"+vueuser.id)
+        MorseService.fetchCourses(vueuser.id)
+          .then(response => {
+            console.log(response.data)
+            this.courses=response.data
+            var tempcount=0;
+            response.data.forEach(function (item) {
+              item.count=item.coursecontent.length-tempcount;
+              tempcount=item.coursecontent.length
+            })
+          })
+          .catch(error => {
+            this.errors.push(error)
+            console.log(error)
+          })
+      }
+      ,checkUser: function (vueuser,usersignedin) {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            //console.log(user.email)
+            vueuser.email=user.email
+            vueuser.id=user.uid
+            usersignedin.status=true
+          } else {
+            // No user is signed in.
+            usersignedin.status=false
+            console.log("no User Logged in")
+          }
+        });
+
+      }
+    }
+    }
+</script>
+
+<style scoped>
+
+</style>
